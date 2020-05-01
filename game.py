@@ -1,22 +1,26 @@
+import csv
 from classes import models
 from classes import exceptions
-import csv
-import datetime
-from Module.classes.models import Player
+
+# from Module.classes.models import Player
+
 player_lives = 5
+
 
 def main():
     try:
         level = 1
-        lives = level
-        command = input("Enter the command START, SCORES, HELP ")
+        lives = 1
+        command = input("Enter the command START, SHOW SCORES, HELP, EXIT ")
 
         if command.lower() == "start":
 
             # block with constants
             name = input("Enter players name: ")
             score = 0
-
+            all_attack = 0
+            player = models.Player(name, player_lives, score, all_attack)
+            enemy = models.Enemy(level, lives)
             all_attack = 0
             rigth_attacks = [1, 2, 3]
             st_defense = 0
@@ -24,65 +28,70 @@ def main():
             ######################
             while True:
 
-            # block for input validation
+                # block for input validation
                 try:
-                    all_attack = int(input("Enter 1, 2, 3 "))
+                    all_attack = int(input("Chooser your fighter: 1 - mage, 2 - warrior, 3 - rouge "))
                     if all_attack not in rigth_attacks:
                         raise ValueError
-                    elif type(all_attack) != int:
-                        raise TypeError
+
                 except ValueError:
                     print("You can enter only 1, 2, 3")
 
                 except TypeError:
                     print("You can enter only 1, 2, 3")
-            ######################
-            # in this block creating the player and enemy
-                player = models.Player(name, player_lives, score, all_attack)
-                enemy = models.Enemy(level, lives)
-            # block attack
-                st_attak = player.attack(enemy)
-                # block defense
-                if enemy.lives > 0:
-                    all_attack = int(input("Enter 1, 2, 3 "))
-                    st_defense = player.defence(enemy)
-            ######################
-            # fight block
-                player.fight(st_attak, st_defense)
-                print(player.lives)
-                print(enemy.lives)
-            ######################
-            pass
-        elif command.lower() == 'scores':
-            pass
+                ######################
+                # in this block creating the player and enemy
+                player.allowed_attacks = all_attack
+                # block attack
+                try:
+                    st_attak = player.attack(enemy)
+                    # block defense
+                    if enemy.lives > 0:
+                        all_attack = int(input("Chooser your defender: 1 - mage, 2 - warrior, 3 - rouge "))
+                        player.allowed_attacks = all_attack
+                        st_defense = player.defence(enemy)
+                    ######################
+                    # fight block
+                    player.fight(st_attak, st_defense)
+                    print(f'You have {player.lives} lives')
+                    print(f'Enemy have {enemy.lives} lives')
+                    print("--------------------------------------")
+                ######################
+                except exceptions.EnemyDown:
+                    print("Enemy down")
+                    level += 1
+                    enemy.lives = level
+                    score += 5
+                    print("New enemy added")
+                    print(f'Welcome to the level: {level}')
+                    print(enemy.lives)
+
+        elif command.lower() == 'show scores':
+            with open('scores.txt', 'r') as file:
+                reader = csv.reader(file)
+                for item in reader:
+                    print(item)
 
         elif command.lower() == 'help':
-            pass
-    except exceptions.EnemyDown:
-        print("Enemy down")
+            print("""
+            This is simple game.
+            I know it looks like Copro Code or hodgie code
+            """)
 
+        elif command.lower() == 'exit':
+            raise KeyboardInterrupt
     except exceptions.GameOver:
         print("Game over")
+        print(f"Your result is: {score}")
         with open('scores.txt', 'a', newline='') as file:
             witer = csv.writer(file)
             witer.writerow([name, score])
+
+    except KeyboardInterrupt:
+        pass
     finally:
         print("Good bye!")
 
 
 if __name__ == '__main__':
     main()
-
-    # try:
-    # attack = int(input("Chose your fighter 1 - mage, 2 - warrior, 3 - rouge "))
-    #     if attack not in rigth_attacks:
-    #         raise ValueError
-    #     elif type(attack) != int:
-    #         raise TypeError
-    #     else:
-    #         continue
-    # except ValueError:
-    #     print("You can enter only 1, 2, 3")
-    # except TypeError:
-    #     print("You can enter only 1, 2, 3")
-    ########################################
