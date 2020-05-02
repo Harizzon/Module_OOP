@@ -1,5 +1,4 @@
 from random import choice
-# import exceptions
 from classes import exceptions
 
 

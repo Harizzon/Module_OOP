@@ -1,10 +1,10 @@
 import csv
 from classes import models
 from classes import exceptions
+from classes import settings
 
-# from Module.classes.models import Player
 
-player_lives = 5
+player_lives = settings.player_lives
 
 
 def main():
@@ -75,7 +75,7 @@ def main():
         elif command.lower() == 'help':
             print("""
             This is simple game.
-            I know it looks like Copro Code or hodgie code
+            
             """)
 
         elif command.lower() == 'exit':
@@ -84,8 +84,8 @@ def main():
         print("Game over")
         print(f"Your result is: {score}")
         with open('scores.txt', 'a', newline='') as file:
-            witer = csv.writer(file)
-            witer.writerow([name, score])
+            file.write([name, score])
+
 
     except KeyboardInterrupt:
         pass
